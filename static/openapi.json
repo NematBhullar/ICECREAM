@@ -1,0 +1,503 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "SENDING INVOICE API",
+    "description": "APIs for sending invoice",
+    "contact": {
+      "name": "ICECREAM",
+      "url": "t.sau@student.unsw.edu.au"
+    },
+    "version": "1.2.1"
+  },
+  "servers": [
+    {
+      "url": "https://www.seng2021g23.tk"
+    }
+  ],
+  "paths": {
+    "/api/v1/send_invoice": {
+      "post": {
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "description": "This takes the recipients' receiving addresses (only email address for now) from the JSON input, and send the UBL format of invoice  to the addresses and generate a communication report to the sender (only JSON for now), which will contains a human-readable message if there is a communication error. The invoice field is the xml format of the e-invoice. The recipients field is an array of objects in Json format. The 'type' field states the method  you would like to send the invoice (we support email. We also support sms, but the recipients need to register their phone number with us first. We may pay twilio to skip the registration step if someone donates us money) and the 'to' field states the recipient (the email address if you are sending an email) you want to send to. The invoice is attached in the email if you are sending the invoice through email. Please set your timeout to a large value or don't set a timeout, as this is a blocking api call and we will only response after sending all the invoices, which takes about 3 seconds for each email. The following is an example to send such request using javascript.\n``` \n  // javascript\n  // ref: https://stackoverflow.com/a/56194505, https://stackoverflow.com/a/50774380\n  let formData = new FormData();\n  const recipients = [\n    {\n      \"type\": \"email\",\n      \"to\": \"z5555555@ad.unsw.edu.au\"\n    },\n    {\n      \"type\": \"email\",\n      \"to\": \"z123456@unsw.edu.au\"\n    }\n  ];\n  const json = JSON.stringify(recipients);\n  const blob = new Blob([json], {\n    type: 'application/json'\n  });\n  formData.append(\"invoice\", myfile);\n  formData.append(\"recipients\", blob);\n  axios({\n    method: 'post',\n    url: our_url + '/api/v1/send_invoice',\n    data: formData,\n    header: {\n              'Accept': 'application/json',\n              'Content-Type': 'multipart/form-data',\n            },\n  });\n  // ref: https://stackoverflow.com/a/50774414\n```\n",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "report-format",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "html",
+                "xml",
+                "json"
+              ]
+            },
+            "description": "the format of the report"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "invoice": {
+                    "type": "string",
+                    "format": "binary"
+                  },
+                  "recipients": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "type": {
+                          "type": "string",
+                          "enum": [
+                            "email",
+                            "sms"
+                          ]
+                        },
+                        "to": {
+                          "type": "string",
+                          "format": "email or e.164 phone number"
+                        },
+                        "sender": {
+                          "type": "string"
+                        },
+                        "message": {
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "type",
+                        "to"
+                      ]
+                    },
+                    "example": [
+                      {
+                        "type": "email",
+                        "to": "z5555555@ad.unsw.edu.au"
+                      },
+                      {
+                        "type": "sms",
+                        "to": "+14155552671"
+                      }
+                    ]
+                  }
+                },
+                "required": [
+                  "invoice",
+                  "recipients"
+                ]
+              },
+              "encoding": {
+                "recipients": {
+                  "contentType": "application/json"
+                }
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "request is success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Report"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "This occurs when there is no json provided, or the json is invalid, or the user does not send us an invoice in the invoice field, or the user does not send the request using multipart/form-data",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error-output"
+                },
+                "example": {
+                  "status": "fail",
+                  "code": 400,
+                  "reason": "The JSON input is not valid."
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "The user is unauthorised as the user does not provide a valid api key",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error-output"
+                },
+                "example": {
+                  "status": "fail",
+                  "code": 401,
+                  "reason": "You are unathorised. Please make sure you provide a valid API key in the header."
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/health": {
+      "get": {
+        "description": "Check the liveness of servers and return some health metrics.",
+        "responses": {
+          "200": {
+            "description": "Successful Sended",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "liveness": {
+                      "type": "string",
+                      "enum": [
+                        "up"
+                      ]
+                    },
+                    "database": {
+                      "type": "object",
+                      "properties": {
+                        "liveness": {
+                          "type": "string",
+                          "enum": [
+                            "up",
+                            "down"
+                          ]
+                        }
+                      }
+                    },
+                    "uptime": {
+                      "type": "string",
+                      "format": "hh:mm:ss.xxxx",
+                      "example": "02:00:32.1234"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "502": {
+            "description": "The server is down and a 502 error page from nginx is returned",
+            "content": {
+              "text/html": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/sender": {
+      "post": {
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "description": "Create an api key for the sender and store the username of the sender, so that the sender can use our service to send invoice by passing the key in the header. Note that the api key will only be created once for each username. Please store the api key securely as others can access the service if they get the key. If you lost your api key, you cannot access to reports you have created. The following are some examples to add the api key to the reqeust.\n```\n  # python\n  import requests\n  r = requests.post(url, data=json.dumps(payload), headers={\n    \"Authorization\": \"Bearer\" + API_KEY\n  })\n```\n```\n  // javascript\n  let request_headers = new Headers();\n  request_headers.append(\"Authorization\",  \"Bearer \" + API_KEY)\n  \n  let request = new Request('/api/v1/reports/',  {\n    method: 'GET',\n    headers: headers\n  });\n```\n",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "username": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "username"
+                ],
+                "example": {
+                  "username": "T13A_ICECREAM"
+                }
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful received API key",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "string",
+                      "enum": [
+                        "success"
+                      ]
+                    },
+                    "token": {
+                      "type": "string",
+                      "format": "bytes"
+                    }
+                  },
+                  "example": {
+                    "status": "success",
+                    "token": "fsdghtrewdfghjuy65refghtyres"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "user passes an invalid json or does not pass a json",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error-output"
+                },
+                "example": {
+                  "status": "fail",
+                  "code": 400,
+                  "reason": "No json is provided."
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "user has already created an API key",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error-output"
+                },
+                "example": {
+                  "status": "fail",
+                  "code": 409,
+                  "reason": "You have already created an API key."
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/reports": {
+      "get": {
+        "description": "Get the list of reports which is generated by the sender",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "report-format",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "html",
+                "xml",
+                "json"
+              ]
+            },
+            "description": "the format of the report"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Get a list of reports",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Report"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "api key is invalid or no api key is provided",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error-output"
+                },
+                "example": {
+                  "status": "fail",
+                  "code": 401,
+                  "reason": "You are unathorised. Please make sure you provide a valid API key in the header."
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/reports/{report_id}": {
+      "get": {
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "description": "get a single report which corresponds to the 'report_id'. The format of a report is the same as the one recieved in the api/v1/send_invoice route.",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "report_id",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid4"
+            },
+            "example": "1fe9b8ac-c673-4e72-8e5d-85e91c108ca0"
+          },
+          {
+            "in": "query",
+            "name": "report-format",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "html",
+                "xml",
+                "json"
+              ]
+            },
+            "description": "the format of the report"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successfully get the report",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Report"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "api key is invalid to read the report, or the report id is invalid",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error-output"
+                },
+                "example": {
+                  "status": "fail",
+                  "code": 401,
+                  "reason": "You are unathorised. Please make sure you provide a valid API key in the header."
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "Error-output": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "string",
+            "enum": [
+              "fail"
+            ]
+          },
+          "reason": {
+            "type": "string"
+          },
+          "code": {
+            "type": "integer",
+            "format": "http-error-code"
+          }
+        }
+      },
+      "Report": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "string",
+            "enum": [
+              "success"
+            ]
+          },
+          "report_id": {
+            "type": "string",
+            "format": "uuid4"
+          },
+          "report": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "type": {
+                  "type": "string",
+                  "enum": [
+                    "email"
+                  ]
+                },
+                "to": {
+                  "type": "string",
+                  "format": "email"
+                },
+                "status": {
+                  "type": "string",
+                  "enum": [
+                    "success",
+                    "fail"
+                  ]
+                },
+                "time": {
+                  "type": "integer",
+                  "format": "unix-timestamp"
+                },
+                "reason": {
+                  "type": "string",
+                  "description": "the reason field will only appear if status is fail"
+                }
+              }
+            }
+          }
+        },
+        "example": {
+          "status": "success",
+          "report_id": "1fe9b8ac-c673-4e72-8e5d-85e91c108ca0",
+          "report": [
+            {
+              "type": "email",
+              "to": "z5555555@ad.unsw.edu.au",
+              "status": "success",
+              "time": 1647184325
+            },
+            {
+              "type": "email",
+              "to": "z123456@unsw.edu.au",
+              "status": "fail",
+              "reason": "the email address does not exist",
+              "time": 1647184326
+            }
+          ]
+        }
+      }
+    },
+    "securitySchemes": {
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer"
+      }
+    }
+  }
+}
