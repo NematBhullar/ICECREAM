@@ -1,0 +1,7 @@
+Structure of company page is:
+
+Exported to App.js => 
+
+companyPage.js -> 
+
+greeting.js + logo.js + login.js + createAccount.js

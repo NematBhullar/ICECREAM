@@ -1,0 +1,37 @@
+[
+  {
+    "id": 1,
+    "itemName": "Dell Computer",
+    "price": 890,
+    "quantity": 5,
+    "totalPrice": 4450
+  },
+  {
+    "id": 2,
+    "itemName": "Shirt",
+    "price": 50,
+    "quantity": 5,
+    "totalPrice": 250
+  },
+  {
+    "id": 3,
+    "itemName": "Car",
+    "price": 35000,
+    "quantity": 1,
+    "totalPrice": 35000
+  },
+  {
+    "id": 4,
+    "itemName": "Orange Juice",
+    "price": 5.5,
+    "quantity": 50,
+    "totalPrice": 275
+  },
+  {
+    "id": 5,
+    "itemName": "Mangos",
+    "price": 3,
+    "quantity": 150,
+    "totalPrice": 450
+  }
+]

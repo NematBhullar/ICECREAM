@@ -1,0 +1,13 @@
+{
+  "rules": {
+    "invoices": {
+      "$uid": {
+        ".write": "auth != null && auth.uid == $uid",
+        ".read": "auth != null && auth.uid == $uid",
+        "$invoice_id": {
+          ".write": "!data.exists() || !newData.exists()"
+        }
+      }
+    }
+  }
+}
