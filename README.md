@@ -1,4 +1,4 @@
-# SENG2021 - e-Invoicing
+# SENG2021 - E-Invoicing
 Website: https://seng2021-app-d4e5c.web.app/
 
 ![test](https://github.com/SENG2021-22T1/ICECREAM/actions/workflows/test.yml/badge.svg)
