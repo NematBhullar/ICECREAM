@@ -9,10 +9,6 @@ An invoice sending application through the Software as a Service (SaaS) model, w
 Website: https://seng2021-app-d4e5c.web.app/
 
 ## 2. Getting Started
-
-### Coverage report
-https://codecov.io/gh/SENG2021-22T1/ICECREAM
-
 ### File Structure
 `src` is where we store the code. The entry point is `application.py`, which is not in `src`. This is because `Elastic Beanstalk` finds the file named `appliaction.py` in the `root` directory by default. `db_model` is a directory that stores the model of the database entity.
 
