@@ -65,6 +65,3 @@ pip freeze > requirements.txt
 ```bash
 make clean
 ```
-
-### Style Guide
-We will try to follow the Google Python Style Guide https://google.github.io/styleguide/pyguide.html.
