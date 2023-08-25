@@ -1,5 +1,5 @@
 # Icecream E-Invoicing
-<img width="1470" alt="Screenshot 2023-08-25 at 5 51 05 pm" src="https://github.com/NematBhullar/IcecreamInvoicing/assets/91060343/b0c27df6-af40-4cc5-b694-cb25999aff21">
+<img width="1301" alt="Screenshot 2023-08-25 at 5 51 05 pm" src="https://github.com/NematBhullar/IcecreamInvoicing/assets/91060343/2089e665-5916-4115-be32-6b9730587e5b">
 
 1. About 
 2. Getting Started 
